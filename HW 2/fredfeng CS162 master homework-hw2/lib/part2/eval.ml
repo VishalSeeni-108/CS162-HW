@@ -9,6 +9,10 @@ exception Stuck of string
 (** Raises an exception indicating that evaluation got stuck. *)
 let im_stuck msg = raise (Stuck msg)
 
+(* let free_vars_binder_helper (e: Lambda) : Vars.t = 
+  let Vars.t expr_vars = (free_vars (snd e)) in
+    if(mem (fst e) expr_vars) then (diff expr_vars (singleton e)) else expr_vars;; *)
+
 (** Computes the set of free variables in the given expression *)
 let rec free_vars (e : expr) : Vars.t =
   (* This line imports the functions in Vars, so you can write [diff .. ..]
@@ -17,8 +21,8 @@ let rec free_vars (e : expr) : Vars.t =
   (* Your code goes here *)
   match e with
   | Num _ -> empty
-  | Binop (_, e1, e2) -> todo ()
-  | Var x -> todo ()
+  | Binop (_, e1, e2) -> (union (free_vars e1) (free_vars e2))
+  | Var x -> (singleton x)
   | Lambda binder -> todo ()
   | App (e1, e2) -> todo ()
   | Let (e1, binder) -> union (free_vars e1) (todo ())
