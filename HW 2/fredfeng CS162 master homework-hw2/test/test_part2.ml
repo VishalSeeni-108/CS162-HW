@@ -82,10 +82,10 @@ let test_alpha_equiv (e1, e2, expected) () =
 let test_alpha_equiv_s (e1, e2, expected) =
   test_alpha_equiv (parse e1, parse e2, expected)
 
-let free_vars_tests = [ ("lambda x. y", [ "y" ]) ]
+let free_vars_tests = [ ("lambda x. y", [ "y" ]); ("x", ["x"]); ("lambda x. x + y + z", ["y"; "z"]); ("lambda x. lambda y. x + y + z + w", ["w"; "z"]); ("x y", ["x"; "y"]); ("0", []); ("let y = x + 1 in y", ["x"]) ]
 
 let subst_tests =
-  [ test_subst_s ("tmp", "1", "tmp + tmp2", (*expected *) "1 + tmp2") ]
+  [ test_subst_s ("tmp", "1", "tmp + tmp2", (*expected *) "1 + tmp2"); test_subst_s ("x", "s", "1", "1"); test_subst_s ("x", "s", "x", "s"); test_subst_s ("x", "s", "y", "y"); test_subst_s ("x", "s", "lambda y. x + 1", "lambda y. s + 1"); test_subst_s ("x", "s", "lambda x. x + 1", "lambda x. x + 1"); test_subst_s ("x", "s", "x + 1 x + 2", "s + 1 s + 2"); test_subst_s ("x", "s", "let x = y + 1 in z", "let x = y + 1 in z"); test_subst_s ("x", "s", "let z = x + 1 in z", "let z = s + 1 in z"); test_subst_s ("x", "s", "let z = y + 1 in x", "let z = y + 1 in s")]
 
 let eval_tests =
   [

@@ -23,19 +23,19 @@ let rec free_vars (e : expr) : Vars.t =
   | Num _ -> empty
   | Binop (_, e1, e2) -> (union (free_vars e1) (free_vars e2))
   | Var x -> (singleton x)
-  | Lambda binder -> todo ()
-  | App (e1, e2) -> todo ()
-  | Let (e1, binder) -> union (free_vars e1) (todo ())
+  | Lambda binder -> (diff (free_vars (snd binder)) (singleton (fst binder)))
+  | App (e1, e2) -> (union (free_vars e1) (free_vars e2))
+  | Let (e1, binder) -> union (free_vars e1) (diff (free_vars (snd binder)) (singleton (fst binder)))
 
 (** Perform substitution c[x -> e], i.e., substituting x with e in c *)
 let rec subst (x : string) (e : expr) (c : expr) : expr =
   match c with
   | Num n -> Num n
-  | Binop (op, c1, c2) -> todo ()
-  | Var y -> todo ()
-  | Lambda binder -> todo ()
-  | App (c1, c2) -> todo ()
-  | Let (c1, binder) -> Let (subst x e c1, todo ())
+  | Binop (op, c1, c2) -> Binop (op, (subst x e c1), (subst x e c2))
+  | Var y -> if (String.equal y x) then (e) else (Var y)
+  | Lambda binder -> let y = (fst binder) in (if ((Bool.not (String.equal x y)) && (Bool.not (Vars.mem y (free_vars e)))) then Lambda (y, (subst x e (snd binder))) else Lambda binder)
+  | App (c1, c2) -> App((subst x e c1), (subst x e c2))
+  | Let (c1, binder) -> Let (subst x e c1, (let y = (fst binder) in (if ((Bool.not (String.equal x y)) && (Bool.not (Vars.mem y (free_vars e)))) then (y, (subst x e (snd binder))) else binder)))
 
 (** Evaluate expression e *)
 let rec eval (e : expr) : expr =
