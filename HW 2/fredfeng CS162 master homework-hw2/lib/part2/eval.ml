@@ -42,10 +42,22 @@ let rec eval (e : expr) : expr =
   try
     match e with
     | Num n -> Num n
-    | Binop (op, e1, e2) -> todo ()
-    | Var x -> todo ()
-    | Lambda binder -> todo ()
-    | App (e1, e2) -> todo ()
+    | Binop (op, e1, e2) -> let expr1 = (eval e1) in (let expr2 = (eval e2) in (match (expr1, expr2) with 
+                                                                                | (Num x, Num y) -> (match op with
+                                                                                                |Add -> (Num (x + y))
+                                                                                                |Sub -> (Num (x - y))
+                                                                                                |Mul -> (Num (x * y)))
+                                                                                | (_, _) -> Binop(op, expr1, expr2)))
+    | Var x -> (Var x)
+    | Lambda binder -> (Lambda binder)
+    | App (e1, e2) -> let expr1 = (eval e1) in (let expr2 = (eval e2) in (match expr1 with
+                                                                          | Lambda x -> (match expr2 with
+                                                                                        | Num y -> (subst (fst x) expr2 (snd x))
+                                                                                        | Var y -> (subst (fst x) expr2 (snd x))
+                                                                                        | Lambda y -> (subst (fst x) expr2 (snd x))
+                                                                                        | _ -> (App (expr1, expr2))
+                                                                                        )
+                                                                          | _ -> im_stuck (Fmt.str "Application to non lambda: %a" Pretty.expr e)))
     | Let (e1, (x, e2)) -> todo ()
     | _ -> im_stuck (Fmt.str "Ill-formed expression: %a" Pretty.expr e)
   with Stuck msg ->
