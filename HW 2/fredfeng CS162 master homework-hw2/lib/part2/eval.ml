@@ -47,18 +47,13 @@ let rec eval (e : expr) : expr =
                                                                                                 |Add -> (Num (x + y))
                                                                                                 |Sub -> (Num (x - y))
                                                                                                 |Mul -> (Num (x * y)))
-                                                                                | (_, _) -> Binop(op, expr1, expr2)))
-    | Var x -> (Var x)
+                                                                                | (_, _) -> im_stuck (Fmt.str "Invalid binop: %a" Pretty.expr e)))
+    | Var x -> im_stuck (Fmt.str "Unassigned: %a" Pretty.expr e)
     | Lambda binder -> (Lambda binder)
     | App (e1, e2) -> let expr1 = (eval e1) in (let expr2 = (eval e2) in (match expr1 with
-                                                                          | Lambda x -> (match expr2 with
-                                                                                        | Num y -> (subst (fst x) expr2 (snd x))
-                                                                                        | Var y -> (subst (fst x) expr2 (snd x))
-                                                                                        | Lambda y -> (subst (fst x) expr2 (snd x))
-                                                                                        | _ -> (App (expr1, expr2))
-                                                                                        )
+                                                                          | Lambda x -> (eval (subst (fst x) expr2 (snd x)))
                                                                           | _ -> im_stuck (Fmt.str "Application to non lambda: %a" Pretty.expr e)))
-    | Let (e1, (x, e2)) -> todo ()
+    | Let (e1, (x, e2)) -> let v1 = (eval e1) in (eval (subst x v1 e2))
     | _ -> im_stuck (Fmt.str "Ill-formed expression: %a" Pretty.expr e)
   with Stuck msg ->
     im_stuck (Fmt.str "%s\nin expression %a" msg Pretty.expr e)

@@ -92,8 +92,9 @@ let eval_tests =
     test_eval_s ((* input *) "1+2", (* expected *) "3");
     test_eval_s ("3*3", "9");
     test_eval_s ("3-2", "1");
-    test_eval_s ("x", "x");
     test_eval_s ("lambda x. x+1", "lambda x. x+1");
+    test_eval_s ("(lambda x. x+1) 5", "6");  
+    test_eval_s ("let x = 5 in x + 1", "6");
     test_eval_s
       ( "let q = lambda x. x+1 in let b = lambda x, _. x in let a = lambda \
          y,x,f. f y (y x f) in let l = lambda x. x 0 (lambda _.q) in let k = \
