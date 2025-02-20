@@ -69,7 +69,19 @@ let rec eval (e : expr) : expr =
                                                                | True -> (eval e2)
                                                                | False -> (eval e3)
                                                                | _ -> im_stuck (Fmt.str "Non-bool in if statement: %a" Pretty.expr e))  
-  | Comp (op, e1, e2) -> 
+  | Comp (op, e1, e2) -> let arg1 = (eval e1) in (let arg2 = (eval e2) in (match (arg1, arg2) with 
+                                                                          |(Num x, Num y) -> (match op with
+                                                                                              | Eq -> if x = y then True else False
+                                                                                              | Lt -> if x < y then True else False
+                                                                                              | Gt -> if x > y then True else False)
+                                                                          |(_, _) -> im_stuck (Fmt.str "Non-number operands to comparison: %a" Pretty.expr e)))
+  | ListNil -> ListNil
+  | ListCons (e1, e2) -> let arg1 = (eval e1) in (let arg2 = (eval e2) in (ListCons(arg1, arg2)))
+  | ListMatch (e1, e2, (x, (y, e3))) -> let arg1 = (eval e1) in (match arg1 with
+                                                                      |ListNil -> (eval e2)
+                                                                      |ListCons(v1, v2) -> (eval (subst x v1 (subst y v2 e3)))
+                                                                      |_ -> im_stuck (Fmt.str "List error: %a" Pretty.expr e))
+  | Fix (f, e) -> (eval (subst f (Fix(f,e)) e))
   | _ -> im_stuck (Fmt.str "Ill-formed expression: %a" Pretty.expr e)
   with Stuck msg ->
     im_stuck (Fmt.str "%s\nin expression %a" msg Pretty.expr e)

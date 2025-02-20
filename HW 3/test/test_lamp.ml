@@ -100,6 +100,14 @@ let eval_tests =
   [
     t (* input *) "1+2" (* expected *) "3";
     t "if true then 1 else 0" "1";
+    t "5 = 5" "true"; 
+    t "1 < 5" "true"; 
+    t "6 > 5" "true"; 
+    t "1 = 5" "false"; 
+    t "1::2::3" "1::2::3"; 
+    t "1+0::2+0::3+0" "1::2::3"; 
+    t "match Nil with Nil -> 1 | x::xs -> 0 end" "1"; 
+    t "match (1::2::3) with Nil -> 1 | x::xs -> 0 end" "0"; 
     tf (* input file *) "examples/fib.lp" (* expected *) "832040";
     tf "examples/add_n.lp" "11::12::Nil";
     tf "examples/primes.lp"
