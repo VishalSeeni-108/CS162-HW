@@ -86,11 +86,11 @@ let test_stuck_s (e_str : string) = test_stuck (parse e_str)
 
 let free_vars_tests =
   let t = test_free_vars_s in
-  [ t "fix x is y" [ "y" ] ]
+  [ t "match (a + 1) with Nil -> (b + 1) | x::xs -> (c + 1) end" ["a"; "b"; "c"]; t "fix x is y" [ "y" ]; t "if true then x + 1 else y - 2" ["x"; "y"]; t "(x+1) = (y+2)" ["x"; "y"]; t "x::(y::z)" ["x"; "y"; "z"]]
 
 let subst_tests =
   let t x e c = test_subst_s ~x ~e ~c in
-  [ t (* arguments *) "var" "1" "var < var" (*expected *) "1 < 1" ]
+  [ t (* arguments *) "var" "1" "var < var" (*expected *) "1 < 1"; t "x" "true" "if x then x else false" "if true then true else false"; t "x" "1" "x::(0::x)" "1::(0::1)"; t "x" "5" "match x with Nil -> x | x::xs -> x end" "match 5 with Nil -> 5 |x::xs -> x end"; t "x" "5" "fix x is x" "fix x is x"; t "y" "5" "fix x is x + y" "fix x is x + 5"]
 
 let eval_tests =
   (* test an input expression evaluates to the expected output *)
@@ -99,6 +99,15 @@ let eval_tests =
   let tf = test_eval_file in
   [
     t (* input *) "1+2" (* expected *) "3";
+    t "if true then 1 else 0" "1";
+    t "5 = 5" "true"; 
+    t "1 < 5" "true"; 
+    t "6 > 5" "true"; 
+    t "1 = 5" "false"; 
+    t "1::2::3" "1::2::3"; 
+    t "1+0::2+0::3+0" "1::2::3"; 
+    t "match Nil with Nil -> 1 | x::xs -> 0 end" "1"; 
+    t "match (1::2::3) with Nil -> 1 | x::xs -> 0 end" "0"; 
     tf (* input file *) "examples/fib.lp" (* expected *) "832040";
     tf "examples/add_n.lp" "11::12::Nil";
     tf "examples/primes.lp"

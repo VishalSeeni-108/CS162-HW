@@ -1,0 +1,66 @@
+type token =
+    WITH
+  | TRUE
+  | TIMES
+  | THINARROW
+  | THEN
+  | SUB
+  | SND
+  | RPAREN
+  | REC
+  | PLUS
+  | NUMBER of int
+  | NIL
+  | MATCH
+  | LT
+  | LPAREN
+  | LET
+  | LAMBDA
+  | IS
+  | IN
+  | IF
+  | ID of string
+  | GT
+  | FUN
+  | FST
+  | FIX
+  | FILE of string
+  | FALSE
+  | EQ
+  | EOF
+  | END
+  | ELSE
+  | E2
+  | E1
+  | DOT
+  | CSAVE
+  | CPRINT
+  | CONS
+  | COMMA
+  | CLOAD
+  | CLET
+  | CCLEAR
+  | BAR
+val mk_lambdas : string list -> Ast.expr -> Ast.expr
+val menhir_begin_marker : int
+val xv_term : Ast.expr
+val xv_sum_match : Ast.expr
+val xv_separated_nonempty_list_COMMA_bind_ : string list
+val xv_script_eof : Cmd.t list
+val xv_repl_command_eof : Cmd.t
+val xv_repl_command : Cmd.t
+val xv_option_BAR_ : unit option
+val xv_nil_branch : Ast.expr
+val xv_list_match : Ast.expr
+val xv_list_file_command_ : Cmd.t list
+val xv_file_command : Cmd.t
+val xv_expr_eof : Ast.expr
+val xv_expr : Ast.expr
+val xv_cons_branch : string * string * Ast.expr
+val xv_branch_E2_ : Ast.expr Ast.binder
+val xv_branch_E1_ : Ast.expr Ast.binder
+val xv_binop_expr_ : Ast.expr
+val xv_bindlist : string list
+val xv_bind : string
+val xv_app : Ast.expr
+val menhir_end_marker : int
