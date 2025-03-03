@@ -73,11 +73,42 @@ let well_typed_tests =
     check_well_typed_s
       ~gamma:[ ("x", "Bool") ]
       (* input expression *) "x" (* expected output type *) "Bool";
+    check_well_typed_s
+      ~gamma:[]
+      (* input expression *) "5 + 5" (* expected output type *) "Int";
+    check_well_typed_s
+      ~gamma:[]
+      (* input expression *) "5 = 5" (* expected output type *) "Bool";
+    check_well_typed_s
+      ~gamma:[]
+      (* input expression *) "if true then 1 else 2" (* expected output type *) "Int";
+    check_well_typed_s
+      ~gamma:[]
+      (* input expression *) "if false then true else false" (* expected output type *) "Bool";
+    check_well_typed_s
+      ~gamma:[]
+      (* input expression *) "lambda x: Bool.5" (* expected output type *) "Bool -> Int";
+    check_well_typed_s
+      ~gamma:[]
+      (* input expression *) "(lambda x: Bool.5) true" (* expected output type *) "Int";
+    check_well_typed_s
+      ~gamma:[("x", "Int")]
+      (* input expression *) "let x = 5 in true" (* expected output type *) "Bool";
+    check_well_typed_s
+      ~gamma:[]
+      (* input expression *) "Nil[Bool]" (* expected output type *) "List[Bool]";
+    check_well_typed_s
+      ~gamma:[]
+      (* input expression *) "1::2::3::Nil[Int]" (* expected output type *) "List[Int]";
     check_well_typed_file "examples/fib.lp" "Int";
     check_well_typed_file "examples/add_n.lp" "List[Int]";
   ]
 
 let ill_typed_tests =
-  [ check_ill_typed ~gamma:[] (* input expression *) "1 + true" ]
+  [ check_ill_typed ~gamma:[] (* input expression *) "1 + true"; 
+    check_ill_typed ~gamma:[] (* input expression *) "if 1 then 1 else 2";
+    check_ill_typed ~gamma:[] (* input expression *) "(lambda x: Bool.5) 2";
+    check_ill_typed ~gamma:[] (* input expression *) "let x = 5 in true";
+    check_ill_typed ~gamma:[] (* input expression *) "1::false::3::Nil[Int]"; ]
 
 let tests = [ ("well_typed", well_typed_tests); ("ill_typed", ill_typed_tests) ]
