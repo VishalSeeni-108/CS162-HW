@@ -100,6 +100,9 @@ let well_typed_tests =
     check_well_typed_s
       ~gamma:[]
       (* input expression *) "1::2::3::Nil[Int]" (* expected output type *) "List[Int]";
+      check_well_typed_s
+      ~gamma:[]
+      (* input expression *) "match (1::2::3::Nil[Int]) with Nil -> 1 | x::xs -> 0 end" (* expected output type *) "Int";
     check_well_typed_file "examples/fib.lp" "Int";
     check_well_typed_file "examples/add_n.lp" "List[Int]";
   ]
@@ -108,7 +111,7 @@ let ill_typed_tests =
   [ check_ill_typed ~gamma:[] (* input expression *) "1 + true"; 
     check_ill_typed ~gamma:[] (* input expression *) "if 1 then 1 else 2";
     check_ill_typed ~gamma:[] (* input expression *) "(lambda x: Bool.5) 2";
-    check_ill_typed ~gamma:[] (* input expression *) "let x = 5 in true";
+    check_ill_typed ~gamma:[] (* input expression *) "let x = true in x + 2";
     check_ill_typed ~gamma:[] (* input expression *) "1::false::3::Nil[Int]"; ]
 
 let tests = [ ("well_typed", well_typed_tests); ("ill_typed", ill_typed_tests) ]

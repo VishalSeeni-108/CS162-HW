@@ -45,12 +45,17 @@ let rec abstract_eval (env : env) (e : expr) : ty =
     | App (e1, e2) -> (match (abstract_eval env e1) with
                       | TFun(t1, t2) -> (if (equal_ty t1 (abstract_eval env e2)) then t2 else (ty_err "\ntype error 1 in app")) 
                       | _ -> (ty_err "\ntype error 2 in app"))
-    | Let (e1, (x, e2)) -> let t1 = (abstract_eval env e1) in (match (find env x) with 
-                                                              | Some xType -> if (equal_ty t1 xType) then (abstract_eval env e2) else (ty_err "\ntype error 1 in let")
-                                                              | None -> (ty_err "\ntype error 2 in let"))
+    | Let (e1, (x, e2)) -> let t1 = (abstract_eval env e1) in (abstract_eval (add env x t1) e2)
     | ListNil t -> (match t with 
                   | Some nilType -> (TList nilType)
                   | None -> (ty_err "type error in ListNil"))
     | ListCons (e1, e2) -> let t = (abstract_eval env e1) in (let t_con = (abstract_eval env e2) in (if (equal_ty t_con (TList t)) then (TList t) else (ty_err "\ntype error in ListCons")))
-    | ListMatch (e1, e2, (x, (y, e3))) -> (match (abstract_eval env e1) with)
+    | ListMatch (e1, e2, (x, (y, e3))) -> (match (abstract_eval env e1) with
+                                          | (TList t1) -> let t2 = (abstract_eval env e2) in (if (equal_ty t2 (abstract_eval (add (add env x t1) y (TList t1)) e3)) then t2 else (ty_err "type error 2 in ListMatch"))
+                                          | _ -> (ty_err "type error 1 in ListMatch"))
+    | Fix ((funType, (f, e))) -> (match funType with
+                                | Some t -> (abstract_eval (add env f t) e)
+                                | None -> (ty_err "type error in Fix"))
+    | Annot (e, t) -> if(equal_ty (abstract_eval env e) t) then t else (ty_err "type error in Annot")
+    | _ -> (ty_err "type error, ill formed expression")
   with Type_error msg -> ty_err (msg ^ "\nin expression " ^ show_expr e)
